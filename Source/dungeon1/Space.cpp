@@ -10,7 +10,7 @@ ASpace::ASpace()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	ASpace::BuildRoom();
+	//ASpace::BuildRoom();
 }
 
 // Called when the game starts or when spawned
@@ -28,21 +28,37 @@ void ASpace::Tick(float DeltaTime)
 void ASpace::BuildRoom()
 {
 	// Add floor static mesh
-	UBoxComponent* FloorComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("RootComponent"));
+	UBoxComponent* FloorComponent = NewObject<UBoxComponent>(this);
 	RootComponent = FloorComponent;
 	FloorComponent->SetCollisionProfileName(TEXT("Pawn"));
 
-	UStaticMeshComponent* FloorVisual = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("VisualRepresentation"));
+	UStaticMeshComponent* FloorVisual = NewObject<UStaticMeshComponent>(this);
 	FloorVisual->SetupAttachment(RootComponent);
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> FloorVisualAsset(TEXT("/Game/StarterContent/Shapes/Shape_Tube.Shape_Tube"));
-	if (FloorVisualAsset.Succeeded())
-	{
-		FloorVisual->SetStaticMesh(FloorVisualAsset.Object);
-		FloorVisual->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
-		FloorVisual->SetWorldScale3D(FVector(1.0f));
-	}
 
-	UE_LOG(YourLog, Warning, TEXT("Space object reporting for duty!"));
+	UInstancedStaticMeshComponent* ISMComp = NewObject<UInstancedStaticMeshComponent>(this);
+	ISMComp->RegisterComponent();
+
+
+	//if (ASpace::East)
+	//{
+	//	static ConstructorHelpers::FObjectFinder<UStaticMesh> FloorVisualAsset(TEXT("/Game/StarterContent/Shapes/Shape_Tube.Shape_Tube"));
+	//	if (FloorVisualAsset.Succeeded())
+	//	{
+	//		FloorVisual->SetStaticMesh(FloorVisualAsset.Object);
+	//		FloorVisual->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
+	//		FloorVisual->SetWorldScale3D(FVector(1.0f));
+	//	}
+	//}
+	//else
+	//{
+	//	static ConstructorHelpers::FObjectFinder<UStaticMesh> FloorVisualAsset(TEXT("/Game/StarterContent/Shapes/Shape_TriPyramid.Shape_TriPyramid"));
+	//	if (FloorVisualAsset.Succeeded())
+	//	{
+	//		FloorVisual->SetStaticMesh(FloorVisualAsset.Object);
+	//		FloorVisual->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
+	//		FloorVisual->SetWorldScale3D(FVector(1.0f));
+	//	}
+	//}
 
 	// Add corner posts
 

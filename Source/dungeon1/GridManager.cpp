@@ -13,10 +13,9 @@ void AGridManager::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// Test logging
 	UE_LOG(YourLog, Warning, TEXT("Grid Manager reporting for duty!"));
 
-	AGridManager::GenerateGrid(10, 10);
+	AGridManager::ResetGrid(AGridManager::Rows, AGridManager::Columns);
 }
 
 void AGridManager::GenerateSpaces()
@@ -31,32 +30,44 @@ void AGridManager::GenerateSpaces()
 	// Each Row
 	for (int row = 0; row < _grid->NumRows(); row++)
 	{
-		//UE_LOG(YourLog, Warning, TEXT("Row Loop"));
-
 		for (int col = 0; col < _grid->NumColumns(); col++)
 		{
 			FVector Location(spaceWidth * col, spaceHeight * row, 200.0f);
 			FRotator Rotation(0.0f, 0.0f, 0.0f);
 			FActorSpawnParameters SpawnInfo;
 			SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-			GetWorld()->SpawnActor<ASpace>(Location, Rotation, SpawnInfo);
+			ASpace* _newSpace = GetWorld()->SpawnActor<ASpace>(Location, Rotation, SpawnInfo);
 
-			//UE_LOG(YourLog, Warning, TEXT("Column Loop"));
+			// Set pointer to this manager onto the Space
+			// Or to the Grid?
+			_newSpace->GridManager = this;
+			_newSpace->SpaceCell = &_grid->Cells()[row][col];
+			_newSpace->Row = row;
+			_newSpace->Column = col;
 
-			// If East is linked then open, else a wall edge
-			if (_grid->Cells()[row][col].IsLinked(_grid->Cells()[row][col].East))
+			if (_grid->Cells()[row][col].East == nullptr)
 			{
-				//UE_LOG(YourLog, Warning, TEXT("East is open"));
+				_newSpace->East = false;
 			}
 			else
 			{
-				//UE_LOG(YourLog, Warning, TEXT("East is closed"));
+				_newSpace->East = true;
 			}
+
+			_newSpace->BuildRoom();
+
+			FString _output = "Output:\n\n";
+			if (_grid->Cells()[row][col].IsLinked(_grid->Cells()[row][col].North)) _output += FString::Printf(TEXT("row:%d col:%d -- North is linked\n"), row, col);
+			if (_grid->Cells()[row][col].IsLinked(_grid->Cells()[row][col].South)) _output += FString::Printf(TEXT("row:%d col:%d -- South is linked\n"), row, col);
+			if (_grid->Cells()[row][col].IsLinked(_grid->Cells()[row][col].East)) _output += FString::Printf(TEXT("row:%d col:%d -- East is linked\n"), row, col);
+			if (_grid->Cells()[row][col].IsLinked(_grid->Cells()[row][col].West)) _output += FString::Printf(TEXT("row:%d col:%d -- West is linked\n"), row, col);
+
+			UE_LOG(YourLog, Warning, TEXT("%s"), *_output);
 		}
 	}
 }
 
-void AGridManager::GenerateGrid(int32 Rows, int32 Columns)
+void AGridManager::ResetGrid(int32 Rows, int32 Columns)
 {
 	AGridManager::Rows = Rows;
 	AGridManager::Columns = Columns;

@@ -20,7 +20,7 @@ public:
 	Grid* _grid = nullptr;
 
 	UFUNCTION(BlueprintCallable, Category = "Grid Management")
-	void GenerateGrid(int32 Rows, int32 Columns);
+	void ResetGrid(int32 Rows, int32 Columns);
 
 	UFUNCTION(BlueprintCallable, Category = "Grid Management")
 	void GenerateSpaces();
@@ -36,6 +36,6 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
-	int32 Rows;
-	int32 Columns;
+	int32 Rows = 10;
+	int32 Columns = 10;
 };
